@@ -6,10 +6,11 @@ import { useCallback } from "react";
 type Props = {
   search: string;
   callStatus: string;
-  interested: string | string[] | undefined;
+  interested: string;
   meetingType: string;
   callStatuses: string[];
   meetingTypes: string[];
+  interestedOptions: string[];
 };
 
 export default function SearchFilters({
@@ -19,6 +20,7 @@ export default function SearchFilters({
   meetingType,
   callStatuses,
   meetingTypes,
+  interestedOptions,
 }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -97,7 +99,7 @@ export default function SearchFilters({
               Interested
             </label>
             <select
-              value={interested === "true" ? "true" : interested === "false" ? "false" : ""}
+              value={interested}
               onChange={(e) =>
                 updateParams({
                   interested: e.target.value || null,
@@ -106,8 +108,11 @@ export default function SearchFilters({
               className="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">All</option>
-              <option value="true">Yes</option>
-              <option value="false">No</option>
+              {interestedOptions.map((opt) => (
+                <option key={opt} value={opt}>
+                  {opt}
+                </option>
+              ))}
             </select>
           </div>
 
@@ -118,7 +123,7 @@ export default function SearchFilters({
             <select
               value={meetingType}
               onChange={(e) =>
-                updateParams({ meeting_type: e.target.value || null })
+                updateParams({ call_meeting_type: e.target.value || null })
               }
               className="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             >

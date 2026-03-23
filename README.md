@@ -20,11 +20,11 @@ A Next.js admin panel for managing contacts from Supabase with password-only log
 
 2. **Configure environment**
    - Copy `.env.example` to `.env.local`
-   - Add your Supabase URL and anon key from the Supabase dashboard
+   - Add your Supabase URL and **service role key** (Project Settings > API > `service_role` secret) – required when using RLS
    - Set `ADMIN_PASSWORD` for login
 
 3. **Supabase table**
-   Ensure your Supabase table is named `contacts` and has these columns:
+   Ensure your Supabase table is named `Contacts` and has these columns:
    - `id` (uuid, optional - email can be primary key)
    - `first_name` (text)
    - `last_name` (text)
@@ -32,10 +32,10 @@ A Next.js admin panel for managing contacts from Supabase with password-only log
    - `whatsapp_phone_number` (text)
    - `phone_number` (text)
    - `call_status` (text)
-   - `interested` (boolean)
+   - `interested` (text: NOT_INTERESTED, COULD_NOT_CALL, or call_status values)
    - `call_summary` (text)
    - `create_date` (timestamp)
-   - `meeting_type` (text)
+   - `call_meeting_type` (text)
    - `call_recording` (text, URL)
 
 4. **Run locally**

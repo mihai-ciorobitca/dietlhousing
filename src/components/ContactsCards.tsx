@@ -42,22 +42,43 @@ export default function ContactsCards({ contacts }: { contacts: Contact[] }) {
               {contact.whatsapp_phone_number || contact.phone_number}
             </p>
           )}
-          <div className="flex flex-wrap gap-2 mt-3">
-            {contact.call_status && (
-              <span className="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-slate-200 dark:bg-slate-600 text-slate-700 dark:text-slate-200">
-                {contact.call_status}
-              </span>
-            )}
-            {contact.interested === true && (
-              <span className="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400">
-                Interested
-              </span>
-            )}
-            {contact.meeting_type && (
-              <span className="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400">
-                {contact.meeting_type}
-              </span>
-            )}
+          <div className="flex flex-col gap-2 mt-3 text-sm">
+            <div className="flex items-center gap-2">
+              <span className="text-slate-500 dark:text-slate-400 min-w-[90px]">Call Status</span>
+              {contact.call_status ? (
+                <span className="inline-flex px-2 py-0.5 text-xs font-medium rounded-full bg-slate-200 dark:bg-slate-600 text-slate-700 dark:text-slate-200">
+                  {contact.call_status}
+                </span>
+              ) : (
+                <span className="text-slate-400">—</span>
+              )}
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-slate-500 dark:text-slate-400 min-w-[90px]">Interested</span>
+              {contact.interested ? (
+                <span
+                  className={`inline-flex px-2 py-0.5 text-xs font-medium rounded-full ${
+                    contact.interested === "BOOKED" || contact.interested === "CALL_LATER"
+                      ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
+                      : "bg-slate-200 dark:bg-slate-600 text-slate-700 dark:text-slate-200"
+                  }`}
+                >
+                  {contact.interested}
+                </span>
+              ) : (
+                <span className="text-slate-400">—</span>
+              )}
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-slate-500 dark:text-slate-400 min-w-[90px]">Meeting Type</span>
+              {contact.call_meeting_type ? (
+                <span className="inline-flex px-2 py-0.5 text-xs font-medium rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400">
+                  {contact.call_meeting_type}
+                </span>
+              ) : (
+                <span className="text-slate-400">—</span>
+              )}
+            </div>
           </div>
           <p className="text-slate-500 dark:text-slate-400 text-xs mt-3">
             {formatDate(contact.create_date)}

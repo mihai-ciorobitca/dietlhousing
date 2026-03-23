@@ -1,9 +1,16 @@
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "https://placeholder.supabase.co";
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "placeholder-key-for-build";
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "placeholder-key-for-build";
 
-export const supabase: SupabaseClient = createClient(supabaseUrl, supabaseAnonKey);
+/**
+ * Server-side Supabase client using service role key.
+ * Required for tables with RLS – the service key bypasses RLS policies.
+ * Never expose SUPABASE_SERVICE_ROLE_KEY to the client.
+ */
+export const supabase: SupabaseClient = createClient(supabaseUrl, supabaseServiceKey, {
+  auth: { persistSession: false },
+});
 
 export type Contact = {
   id?: string;
@@ -13,9 +20,9 @@ export type Contact = {
   whatsapp_phone_number: string | null;
   phone_number: string | null;
   call_status: string | null;
-  interested: boolean | null;
+  interested: string | null;
   call_summary: string | null;
   create_date: string | null;
-  meeting_type: string | null;
+  call_meeting_type: string | null;
   call_recording: string | null;
 };

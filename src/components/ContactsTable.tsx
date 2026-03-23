@@ -86,18 +86,22 @@ export default function ContactsTable({ contacts }: { contacts: Contact[] }) {
                   </span>
                 </td>
                 <td className="px-4 py-3">
-                  {contact.interested === true ? (
-                    <span className="text-green-600 dark:text-green-400 font-medium">
-                      Yes
+                  {contact.interested ? (
+                    <span
+                      className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+                        contact.interested === "BOOKED" || contact.interested === "CALL_LATER"
+                          ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
+                          : "bg-slate-200 dark:bg-slate-600 text-slate-700 dark:text-slate-200"
+                      }`}
+                    >
+                      {contact.interested}
                     </span>
-                  ) : contact.interested === false ? (
-                    <span className="text-slate-400">No</span>
                   ) : (
                     "—"
                   )}
                 </td>
                 <td className="px-4 py-3 text-slate-600 dark:text-slate-400 text-sm">
-                  {contact.meeting_type || "—"}
+                  {contact.call_meeting_type || "—"}
                 </td>
                 <td className="px-4 py-3 text-slate-600 dark:text-slate-400 text-sm">
                   {formatDate(contact.create_date)}
