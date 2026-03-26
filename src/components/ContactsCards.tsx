@@ -1,6 +1,7 @@
 "use client";
 
 import type { Contact } from "@/lib/supabase";
+import DeleteContactButton from "./DeleteContactButton";
 
 function formatDate(dateStr: string | null) {
   if (!dateStr) return "—";
@@ -102,6 +103,13 @@ export default function ContactsCards({ contacts }: { contacts: Contact[] }) {
               )}
             </div>
           )}
+          <div className="mt-4 flex justify-end border-t border-slate-200 dark:border-slate-700 pt-4">
+            <DeleteContactButton
+              email={contact.email}
+              label={`${contact.first_name} ${contact.last_name}`.trim() || contact.email}
+              className="w-full sm:w-auto"
+            />
+          </div>
         </div>
       ))}
     </div>

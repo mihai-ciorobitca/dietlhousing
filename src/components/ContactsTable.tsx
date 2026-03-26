@@ -1,6 +1,7 @@
 "use client";
 
 import type { Contact } from "@/lib/supabase";
+import DeleteContactButton from "./DeleteContactButton";
 
 function formatDate(dateStr: string | null) {
   if (!dateStr) return "—";
@@ -49,6 +50,9 @@ export default function ContactsTable({ contacts }: { contacts: Contact[] }) {
               </th>
               <th className="px-4 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
                 Created
+              </th>
+              <th className="px-4 py-3 text-right text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
+                Actions
               </th>
             </tr>
           </thead>
@@ -105,6 +109,12 @@ export default function ContactsTable({ contacts }: { contacts: Contact[] }) {
                 </td>
                 <td className="px-4 py-3 text-slate-600 dark:text-slate-400 text-sm">
                   {formatDate(contact.create_date)}
+                </td>
+                <td className="px-4 py-3 text-right align-middle">
+                  <DeleteContactButton
+                    email={contact.email}
+                    label={`${contact.first_name} ${contact.last_name}`.trim() || contact.email}
+                  />
                 </td>
               </tr>
             ))}
