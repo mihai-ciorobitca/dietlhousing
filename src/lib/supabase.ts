@@ -25,4 +25,5 @@ export type Contact = {
   create_date: string | null;
   call_meeting_type: string | null;
   call_recording: string | null;
+  prefered_contact: string | null;
 };

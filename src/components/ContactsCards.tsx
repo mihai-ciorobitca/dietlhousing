@@ -45,6 +45,16 @@ export default function ContactsCards({ contacts }: { contacts: Contact[] }) {
           )}
           <div className="flex flex-col gap-2 mt-3 text-sm">
             <div className="flex items-center gap-2">
+              <span className="text-slate-500 dark:text-slate-400 min-w-[90px]">Preferred contact</span>
+              {contact.prefered_contact ? (
+                <span className="inline-flex px-2 py-0.5 text-xs font-medium rounded-full bg-violet-100 dark:bg-violet-900/30 text-violet-800 dark:text-violet-300 capitalize">
+                  {contact.prefered_contact}
+                </span>
+              ) : (
+                <span className="text-slate-400">—</span>
+              )}
+            </div>
+            <div className="flex items-center gap-2">
               <span className="text-slate-500 dark:text-slate-400 min-w-[90px]">Call Status</span>
               {contact.call_status ? (
                 <span className="inline-flex px-2 py-0.5 text-xs font-medium rounded-full bg-slate-200 dark:bg-slate-600 text-slate-700 dark:text-slate-200">

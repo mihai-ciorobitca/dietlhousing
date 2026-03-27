@@ -8,9 +8,11 @@ type Props = {
   callStatus: string;
   interested: string;
   meetingType: string;
+  preferedContact: string;
   callStatuses: string[];
   meetingTypes: string[];
   interestedOptions: string[];
+  preferedContactOptions: string[];
 };
 
 export default function SearchFilters({
@@ -18,9 +20,11 @@ export default function SearchFilters({
   callStatus,
   interested,
   meetingType,
+  preferedContact,
   callStatuses,
   meetingTypes,
   interestedOptions,
+  preferedContactOptions,
 }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -52,7 +56,7 @@ export default function SearchFilters({
         }}
         className="flex flex-col gap-4"
       >
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
           <div className="lg:col-span-2">
             <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">
               Search by name or email
@@ -135,9 +139,29 @@ export default function SearchFilters({
               ))}
             </select>
           </div>
+
+          <div>
+            <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">
+              Preferred contact
+            </label>
+            <select
+              value={preferedContact}
+              onChange={(e) =>
+                updateParams({ prefered_contact: e.target.value || null })
+              }
+              className="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">All</option>
+              {preferedContactOptions.map((v) => (
+                <option key={v} value={v}>
+                  {v}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
-        {(search || callStatus || interested || meetingType) && (
+        {(search || callStatus || interested || meetingType || preferedContact) && (
           <button
             type="button"
             onClick={() => router.push("/admin/contacts")}

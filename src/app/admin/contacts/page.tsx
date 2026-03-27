@@ -12,6 +12,8 @@ async function getContacts(searchParams: SearchParams): Promise<Contact[]> {
     const callStatus = typeof searchParams.call_status === "string" ? searchParams.call_status : "";
     const interested = searchParams.interested;
     const meetingType = typeof searchParams.call_meeting_type === "string" ? searchParams.call_meeting_type : "";
+    const preferedContact =
+      typeof searchParams.prefered_contact === "string" ? searchParams.prefered_contact : "";
 
     let query = supabase.from("Contacts").select("*").order("create_date", { ascending: false });
 
@@ -23,6 +25,7 @@ async function getContacts(searchParams: SearchParams): Promise<Contact[]> {
     if (callStatus) query = query.eq("call_status", callStatus);
     if (interested) query = query.eq("interested", interested);
     if (meetingType) query = query.eq("call_meeting_type", meetingType);
+    if (preferedContact) query = query.eq("prefered_contact", preferedContact);
 
     const { data, error } = await query;
 
@@ -46,16 +49,18 @@ async function getContacts(searchParams: SearchParams): Promise<Contact[]> {
 const CALL_STATUS_OPTIONS = ["BOOKED", "CALL_LATER", "NOT_ANSWERED", "NOT_INTERESTED", "WRONG_PERSON"] as const;
 const MEETING_TYPE_OPTIONS = ["meeting", "whatsapp"] as const;
 const INTERESTED_OPTIONS = ["BOOKED", "CALL_LATER", "COULD_NOT_CALL", "NOT_ANSWERED", "NOT_INTERESTED", "WRONG_PERSON"] as const;
+const PREFERRED_CONTACT_OPTIONS = ["email", "phone", "whatsapp"] as const;
 
 async function getFilterOptions(): Promise<{
   callStatuses: string[];
   meetingTypes: string[];
   interestedOptions: string[];
+  preferedContactOptions: string[];
 }> {
   try {
     const { data } = await supabase
       .from("Contacts")
-      .select("call_status, call_meeting_type, interested");
+      .select("call_status, call_meeting_type, interested, prefered_contact");
 
     const dbCallStatuses = [...new Set(
       (data || []).map((r) => r.call_status).filter((v): v is string => v != null && v !== "")
@@ -72,11 +77,22 @@ async function getFilterOptions(): Promise<{
     const callStatuses = [...new Set([...CALL_STATUS_OPTIONS, ...dbCallStatuses])];
     const meetingTypes = [...new Set([...MEETING_TYPE_OPTIONS, ...dbMeetingTypes])];
     const interestedOptions = [...new Set([...INTERESTED_OPTIONS, ...dbInterested])];
+    const dbPrefered = [...new Set(
+      (data || [])
+        .map((r) => (typeof r.prefered_contact === "string" ? r.prefered_contact : null))
+        .filter((v): v is string => v != null && v !== "")
+    )];
+    const preferedContactOptions = [...new Set([...PREFERRED_CONTACT_OPTIONS, ...dbPrefered])];
 
-    return { callStatuses, meetingTypes, interestedOptions };
+    return { callStatuses, meetingTypes, interestedOptions, preferedContactOptions };
   } catch (e) {
     console.error("getFilterOptions failed:", e instanceof Error ? e.message : e);
-    return { callStatuses: [...CALL_STATUS_OPTIONS], meetingTypes: [...MEETING_TYPE_OPTIONS], interestedOptions: [...INTERESTED_OPTIONS] };
+    return {
+      callStatuses: [...CALL_STATUS_OPTIONS],
+      meetingTypes: [...MEETING_TYPE_OPTIONS],
+      interestedOptions: [...INTERESTED_OPTIONS],
+      preferedContactOptions: [...PREFERRED_CONTACT_OPTIONS],
+    };
   }
 }
 
@@ -86,7 +102,7 @@ export default async function ContactsPage({
   searchParams: Promise<SearchParams>;
 }) {
   const params = await searchParams;
-  const [contacts, { callStatuses, meetingTypes, interestedOptions }] = await Promise.all([
+  const [contacts, { callStatuses, meetingTypes, interestedOptions, preferedContactOptions }] = await Promise.all([
     getContacts(params),
     getFilterOptions(),
   ]);
@@ -108,9 +124,11 @@ export default async function ContactsPage({
         callStatus={typeof params.call_status === "string" ? params.call_status : ""}
         interested={typeof params.interested === "string" ? params.interested : ""}
         meetingType={typeof params.call_meeting_type === "string" ? params.call_meeting_type : ""}
+        preferedContact={typeof params.prefered_contact === "string" ? params.prefered_contact : ""}
         callStatuses={callStatuses}
         meetingTypes={meetingTypes}
         interestedOptions={interestedOptions}
+        preferedContactOptions={preferedContactOptions}
       />
       </Suspense>
 

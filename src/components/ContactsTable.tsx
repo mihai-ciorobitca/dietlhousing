@@ -27,7 +27,7 @@ export default function ContactsTable({ contacts }: { contacts: Contact[] }) {
   return (
     <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[900px]">
+        <table className="w-full min-w-[1000px]">
           <thead>
             <tr className="border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700/50">
               <th className="px-4 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
@@ -38,6 +38,9 @@ export default function ContactsTable({ contacts }: { contacts: Contact[] }) {
               </th>
               <th className="px-4 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
                 Phone
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
+                Preferred contact
               </th>
               <th className="px-4 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
                 Call Status
@@ -77,6 +80,9 @@ export default function ContactsTable({ contacts }: { contacts: Contact[] }) {
                 </td>
                 <td className="px-4 py-3 text-slate-600 dark:text-slate-400 text-sm">
                   {contact.whatsapp_phone_number || contact.phone_number || "—"}
+                </td>
+                <td className="px-4 py-3 text-slate-600 dark:text-slate-400 text-sm capitalize">
+                  {contact.prefered_contact || "—"}
                 </td>
                 <td className="px-4 py-3">
                   <span
