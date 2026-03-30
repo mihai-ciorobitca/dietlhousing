@@ -6,9 +6,22 @@ import { Suspense } from "react";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
+const SEARCH_BY_VALUES = ["email", "name", "phone"] as const;
+type SearchBy = (typeof SEARCH_BY_VALUES)[number];
+
+function parseSearchBy(raw: string | undefined): SearchBy {
+  if (raw && (SEARCH_BY_VALUES as readonly string[]).includes(raw)) {
+    return raw as SearchBy;
+  }
+  return "email";
+}
+
 async function getContacts(searchParams: SearchParams): Promise<Contact[]> {
   try {
     const search = typeof searchParams.search === "string" ? searchParams.search.trim() : "";
+    const searchBy = parseSearchBy(
+      typeof searchParams.search_by === "string" ? searchParams.search_by : undefined
+    );
     const callStatus = typeof searchParams.call_status === "string" ? searchParams.call_status : "";
     const interested = searchParams.interested;
     const meetingType = typeof searchParams.call_meeting_type === "string" ? searchParams.call_meeting_type : "";
@@ -18,9 +31,13 @@ async function getContacts(searchParams: SearchParams): Promise<Contact[]> {
     let query = supabase.from("Contacts").select("*").order("create_date", { ascending: false });
 
     if (search) {
-      query = query.or(
-        `email.ilike.%${search}%,first_name.ilike.%${search}%,last_name.ilike.%${search}%`
-      );
+      if (searchBy === "email") {
+        query = query.ilike("email", `%${search}%`);
+      } else if (searchBy === "name") {
+        query = query.or(`first_name.ilike.%${search}%,last_name.ilike.%${search}%`);
+      } else {
+        query = query.or(`whatsapp_phone_number.ilike.%${search}%,phone_number.ilike.%${search}%`);
+      }
     }
     if (callStatus) query = query.eq("call_status", callStatus);
     if (interested) query = query.eq("interested", interested);
@@ -121,6 +138,9 @@ export default async function ContactsPage({
       <Suspense fallback={<div className="h-24 bg-slate-200 dark:bg-slate-700 rounded-xl animate-pulse" />}>
         <SearchFilters
         search={typeof params.search === "string" ? params.search : ""}
+        searchBy={parseSearchBy(
+          typeof params.search_by === "string" ? params.search_by : undefined
+        )}
         callStatus={typeof params.call_status === "string" ? params.call_status : ""}
         interested={typeof params.interested === "string" ? params.interested : ""}
         meetingType={typeof params.call_meeting_type === "string" ? params.call_meeting_type : ""}

@@ -3,8 +3,11 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
 
+type SearchBy = "email" | "name" | "phone";
+
 type Props = {
   search: string;
+  searchBy: SearchBy;
   callStatus: string;
   interested: string;
   meetingType: string;
@@ -17,6 +20,7 @@ type Props = {
 
 export default function SearchFilters({
   search,
+  searchBy,
   callStatus,
   interested,
   meetingType,
@@ -59,22 +63,45 @@ export default function SearchFilters({
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
           <div className="lg:col-span-2">
             <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">
-              Search by name or email
+              Search
             </label>
-            <div className="flex gap-2">
-              <input
-                name="search"
-                type="text"
-                defaultValue={search}
-                placeholder="Search..."
-                className="flex-1 px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-              />
-              <button
-                type="submit"
-                className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition-colors"
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-stretch">
+              <select
+                value={searchBy}
+                onChange={(e) => {
+                  const v = e.target.value as SearchBy;
+                  updateParams({
+                    search_by: v === "email" ? null : v,
+                  });
+                }}
+                aria-label="Field to search"
+                className="w-full sm:w-[8.5rem] shrink-0 px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                Search
-              </button>
+                <option value="email">Email</option>
+                <option value="name">Name</option>
+                <option value="phone">Phone</option>
+              </select>
+              <div className="flex flex-1 gap-2 min-w-0">
+                <input
+                  name="search"
+                  type="text"
+                  defaultValue={search}
+                  placeholder={
+                    searchBy === "email"
+                      ? "Search email…"
+                      : searchBy === "name"
+                        ? "Search first or last name…"
+                        : "Search phone number…"
+                  }
+                  className="flex-1 min-w-0 px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                />
+                <button
+                  type="submit"
+                  className="shrink-0 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition-colors"
+                >
+                  Search
+                </button>
+              </div>
             </div>
           </div>
 
@@ -161,7 +188,12 @@ export default function SearchFilters({
           </div>
         </div>
 
-        {(search || callStatus || interested || meetingType || preferedContact) && (
+        {(search ||
+          callStatus ||
+          interested ||
+          meetingType ||
+          preferedContact ||
+          searchBy !== "email") && (
           <button
             type="button"
             onClick={() => router.push("/admin/contacts")}

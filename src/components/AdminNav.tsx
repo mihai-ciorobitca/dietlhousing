@@ -32,6 +32,14 @@ export default function AdminNav() {
             >
               Contacts
             </Link>
+            <a
+              href="https://supabase.com/dashboard/project/uhgwmomyrpzlytdfkmht/editor/17544"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 transition-colors"
+            >
+              Supabase editor
+            </a>
           </div>
           <div className="flex items-center">
             <button

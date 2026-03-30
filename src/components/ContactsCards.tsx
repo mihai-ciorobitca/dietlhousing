@@ -1,6 +1,7 @@
 "use client";
 
 import type { Contact } from "@/lib/supabase";
+import CallRecordingPlayer from "./CallRecordingPlayer";
 import DeleteContactButton from "./DeleteContactButton";
 
 function formatDate(dateStr: string | null) {
@@ -90,27 +91,27 @@ export default function ContactsCards({ contacts }: { contacts: Contact[] }) {
                 <span className="text-slate-400">—</span>
               )}
             </div>
+            <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-2">
+              <span className="text-slate-500 dark:text-slate-400 min-w-[90px] shrink-0">call_recording</span>
+              {contact.call_recording ? (
+                <CallRecordingPlayer
+                  src={contact.call_recording}
+                  title={`${contact.first_name} ${contact.last_name}`.trim() || contact.email}
+                  buttonClassName="w-full sm:w-auto justify-center"
+                />
+              ) : (
+                <span className="text-slate-400">—</span>
+              )}
+            </div>
           </div>
           <p className="text-slate-500 dark:text-slate-400 text-xs mt-3">
             {formatDate(contact.create_date)}
           </p>
-          {(contact.call_summary || contact.call_recording) && (
+          {contact.call_summary && (
             <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700">
-              {contact.call_summary && (
-                <p className="text-sm text-slate-600 dark:text-slate-400 line-clamp-2">
-                  {contact.call_summary}
-                </p>
-              )}
-              {contact.call_recording && (
-                <a
-                  href={contact.call_recording}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-blue-600 dark:text-blue-400 hover:underline mt-1 inline-block"
-                >
-                  Listen to recording
-                </a>
-              )}
+              <p className="text-sm text-slate-600 dark:text-slate-400 line-clamp-2">
+                {contact.call_summary}
+              </p>
             </div>
           )}
           <div className="mt-4 flex justify-end border-t border-slate-200 dark:border-slate-700 pt-4">

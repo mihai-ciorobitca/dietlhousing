@@ -1,6 +1,7 @@
 "use client";
 
 import type { Contact } from "@/lib/supabase";
+import CallRecordingPlayer from "./CallRecordingPlayer";
 import DeleteContactButton from "./DeleteContactButton";
 
 function formatDate(dateStr: string | null) {
@@ -50,6 +51,9 @@ export default function ContactsTable({ contacts }: { contacts: Contact[] }) {
               </th>
               <th className="px-4 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
                 Meeting Type
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
+                call_recording
               </th>
               <th className="px-4 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
                 Created
@@ -113,6 +117,16 @@ export default function ContactsTable({ contacts }: { contacts: Contact[] }) {
                 <td className="px-4 py-3 text-slate-600 dark:text-slate-400 text-sm">
                   {contact.call_meeting_type || "—"}
                 </td>
+                <td className="px-4 py-3 align-middle whitespace-nowrap">
+                  {contact.call_recording ? (
+                    <CallRecordingPlayer
+                      src={contact.call_recording}
+                      title={`${contact.first_name} ${contact.last_name}`.trim() || contact.email}
+                    />
+                  ) : (
+                    <span className="text-slate-400">—</span>
+                  )}
+                </td>
                 <td className="px-4 py-3 text-slate-600 dark:text-slate-400 text-sm">
                   {formatDate(contact.create_date)}
                 </td>
@@ -149,14 +163,12 @@ export default function ContactsTable({ contacts }: { contacts: Contact[] }) {
                     </p>
                   )}
                   {contact.call_recording && (
-                    <a
-                      href={contact.call_recording}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 dark:text-blue-400 hover:underline"
-                    >
-                      Listen to recording
-                    </a>
+                    <div className="mt-2">
+                      <CallRecordingPlayer
+                        src={contact.call_recording}
+                        title={`${contact.first_name} ${contact.last_name}`.trim() || contact.email}
+                      />
+                    </div>
                   )}
                 </div>
               ))}
