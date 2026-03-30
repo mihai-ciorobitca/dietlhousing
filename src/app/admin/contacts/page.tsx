@@ -6,7 +6,19 @@ import { Suspense } from "react";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
-const SEARCH_BY_VALUES = ["email", "name", "phone"] as const;
+/** Next.js can pass duplicate query keys as string[] — use first value so filters always apply. */
+function firstStringParam(v: string | string[] | undefined): string {
+  if (typeof v === "string") return v;
+  if (Array.isArray(v) && v.length > 0 && typeof v[0] === "string") return v[0];
+  return "";
+}
+
+/** Escape % and _ so ILIKE treats them as literals, not wildcards (only matching substrings). */
+function escapeIlikePattern(s: string): string {
+  return s.replace(/\\/g, "\\\\").replace(/%/g, "\\%").replace(/_/g, "\\_");
+}
+
+const SEARCH_BY_VALUES = ["email", "phone_number", "whatsapp_number"] as const;
 type SearchBy = (typeof SEARCH_BY_VALUES)[number];
 
 function parseSearchBy(raw: string | undefined): SearchBy {
@@ -18,25 +30,23 @@ function parseSearchBy(raw: string | undefined): SearchBy {
 
 async function getContacts(searchParams: SearchParams): Promise<Contact[]> {
   try {
-    const search = typeof searchParams.search === "string" ? searchParams.search.trim() : "";
-    const searchBy = parseSearchBy(
-      typeof searchParams.search_by === "string" ? searchParams.search_by : undefined
-    );
-    const callStatus = typeof searchParams.call_status === "string" ? searchParams.call_status : "";
-    const interested = searchParams.interested;
-    const meetingType = typeof searchParams.call_meeting_type === "string" ? searchParams.call_meeting_type : "";
-    const preferedContact =
-      typeof searchParams.prefered_contact === "string" ? searchParams.prefered_contact : "";
+    const search = firstStringParam(searchParams.search).trim();
+    const searchBy = parseSearchBy(firstStringParam(searchParams.search_by) || undefined);
+    const callStatus = firstStringParam(searchParams.call_status);
+    const interested = firstStringParam(searchParams.interested);
+    const meetingType = firstStringParam(searchParams.call_meeting_type);
+    const preferedContact = firstStringParam(searchParams.prefered_contact);
 
     let query = supabase.from("Contacts").select("*").order("create_date", { ascending: false });
 
     if (search) {
+      const pattern = `%${escapeIlikePattern(search)}%`;
       if (searchBy === "email") {
-        query = query.ilike("email", `%${search}%`);
-      } else if (searchBy === "name") {
-        query = query.or(`first_name.ilike.%${search}%,last_name.ilike.%${search}%`);
+        query = query.ilike("email", pattern);
+      } else if (searchBy === "phone_number") {
+        query = query.ilike("phone_number", pattern);
       } else {
-        query = query.or(`whatsapp_phone_number.ilike.%${search}%,phone_number.ilike.%${search}%`);
+        query = query.ilike("whatsapp_phone_number", pattern);
       }
     }
     if (callStatus) query = query.eq("call_status", callStatus);
@@ -137,14 +147,12 @@ export default async function ContactsPage({
 
       <Suspense fallback={<div className="h-24 bg-slate-200 dark:bg-slate-700 rounded-xl animate-pulse" />}>
         <SearchFilters
-        search={typeof params.search === "string" ? params.search : ""}
-        searchBy={parseSearchBy(
-          typeof params.search_by === "string" ? params.search_by : undefined
-        )}
-        callStatus={typeof params.call_status === "string" ? params.call_status : ""}
-        interested={typeof params.interested === "string" ? params.interested : ""}
-        meetingType={typeof params.call_meeting_type === "string" ? params.call_meeting_type : ""}
-        preferedContact={typeof params.prefered_contact === "string" ? params.prefered_contact : ""}
+        search={firstStringParam(params.search)}
+        searchBy={parseSearchBy(firstStringParam(params.search_by) || undefined)}
+        callStatus={firstStringParam(params.call_status)}
+        interested={firstStringParam(params.interested)}
+        meetingType={firstStringParam(params.call_meeting_type)}
+        preferedContact={firstStringParam(params.prefered_contact)}
         callStatuses={callStatuses}
         meetingTypes={meetingTypes}
         interestedOptions={interestedOptions}
