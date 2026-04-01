@@ -1,8 +1,12 @@
 "use client";
 
 import type { Contact } from "@/lib/supabase";
+import { formatCallDate } from "@/lib/callDate";
 import CallRecordingPlayer from "./CallRecordingPlayer";
+import ContactScheduleFields from "./ContactScheduleFields";
 import DeleteContactButton from "./DeleteContactButton";
+import MeetingTypeSelect from "./MeetingTypeSelect";
+import SendN8nButton from "./SendN8nButton";
 
 function formatDate(dateStr: string | null) {
   if (!dateStr) return "—";
@@ -81,15 +85,14 @@ export default function ContactsCards({ contacts }: { contacts: Contact[] }) {
                 <span className="text-slate-400">—</span>
               )}
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-slate-500 dark:text-slate-400 min-w-[90px]">Meeting Type</span>
-              {contact.call_meeting_type ? (
-                <span className="inline-flex px-2 py-0.5 text-xs font-medium rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400">
-                  {contact.call_meeting_type}
-                </span>
-              ) : (
-                <span className="text-slate-400">—</span>
-              )}
+            <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-2">
+              <span className="text-slate-500 dark:text-slate-400 min-w-[90px] shrink-0">Meeting Type</span>
+              <MeetingTypeSelect email={contact.email} value={contact.call_meeting_type} />
+            </div>
+            <div className="flex flex-col gap-1">
+              <span className="text-slate-500 dark:text-slate-400 min-w-[90px]">call_date</span>
+              <p className="text-xs text-slate-500 dark:text-slate-400">{formatCallDate(contact.call_date)}</p>
+              <ContactScheduleFields contact={contact} compact />
             </div>
             <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-2">
               <span className="text-slate-500 dark:text-slate-400 min-w-[90px] shrink-0">call_recording</span>
@@ -114,7 +117,8 @@ export default function ContactsCards({ contacts }: { contacts: Contact[] }) {
               </p>
             </div>
           )}
-          <div className="mt-4 flex justify-end border-t border-slate-200 dark:border-slate-700 pt-4">
+          <div className="mt-4 flex flex-col sm:flex-row sm:justify-end gap-2 border-t border-slate-200 dark:border-slate-700 pt-4">
+            <SendN8nButton contact={contact} className="w-full sm:w-auto justify-center" />
             <DeleteContactButton
               email={contact.email}
               label={`${contact.first_name} ${contact.last_name}`.trim() || contact.email}

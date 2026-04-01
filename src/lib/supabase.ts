@@ -24,6 +24,8 @@ export type Contact = {
   call_summary: string | null;
   create_date: string | null;
   call_meeting_type: string | null;
+  /** ISO 8601 UTC from Supabase timestamptz */
+  call_date: string | null;
   call_recording: string | null;
   prefered_contact: string | null;
 };

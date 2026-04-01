@@ -1,8 +1,12 @@
 "use client";
 
 import type { Contact } from "@/lib/supabase";
+import { formatCallDate } from "@/lib/callDate";
 import CallRecordingPlayer from "./CallRecordingPlayer";
+import ContactScheduleFields from "./ContactScheduleFields";
 import DeleteContactButton from "./DeleteContactButton";
+import MeetingTypeSelect from "./MeetingTypeSelect";
+import SendN8nButton from "./SendN8nButton";
 
 function formatDate(dateStr: string | null) {
   if (!dateStr) return "—";
@@ -28,7 +32,7 @@ export default function ContactsTable({ contacts }: { contacts: Contact[] }) {
   return (
     <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[1000px]">
+        <table className="w-full min-w-[1280px]">
           <thead>
             <tr className="border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700/50">
               <th className="px-4 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
@@ -51,6 +55,9 @@ export default function ContactsTable({ contacts }: { contacts: Contact[] }) {
               </th>
               <th className="px-4 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
                 Meeting Type
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
+                call_date
               </th>
               <th className="px-4 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
                 call_recording
@@ -114,8 +121,14 @@ export default function ContactsTable({ contacts }: { contacts: Contact[] }) {
                     "—"
                   )}
                 </td>
-                <td className="px-4 py-3 text-slate-600 dark:text-slate-400 text-sm">
-                  {contact.call_meeting_type || "—"}
+                <td className="px-4 py-3 align-top">
+                  <MeetingTypeSelect email={contact.email} value={contact.call_meeting_type} />
+                </td>
+                <td className="px-4 py-3 align-top text-slate-600 dark:text-slate-400">
+                  <div className="text-xs mb-1.5 text-slate-500 dark:text-slate-400">
+                    {formatCallDate(contact.call_date)}
+                  </div>
+                  <ContactScheduleFields contact={contact} />
                 </td>
                 <td className="px-4 py-3 align-middle whitespace-nowrap">
                   {contact.call_recording ? (
@@ -131,10 +144,13 @@ export default function ContactsTable({ contacts }: { contacts: Contact[] }) {
                   {formatDate(contact.create_date)}
                 </td>
                 <td className="px-4 py-3 text-right align-middle">
-                  <DeleteContactButton
-                    email={contact.email}
-                    label={`${contact.first_name} ${contact.last_name}`.trim() || contact.email}
-                  />
+                  <div className="flex flex-col items-end gap-2">
+                    <SendN8nButton contact={contact} />
+                    <DeleteContactButton
+                      email={contact.email}
+                      label={`${contact.first_name} ${contact.last_name}`.trim() || contact.email}
+                    />
+                  </div>
                 </td>
               </tr>
             ))}

@@ -1,0 +1,21 @@
+/** Common IANA zones for call scheduling (extend as needed). */
+export const COMMON_TIMEZONES: string[] = [
+  "UTC",
+  "America/Sao_Paulo",
+  "America/New_York",
+  "America/Chicago",
+  "America/Denver",
+  "America/Los_Angeles",
+  "America/Mexico_City",
+  "Europe/London",
+  "Europe/Paris",
+  "Europe/Berlin",
+  "Europe/Madrid",
+  "Europe/Rome",
+  "Asia/Dubai",
+  "Asia/Tokyo",
+  "Asia/Shanghai",
+  "Asia/Singapore",
+  "Australia/Sydney",
+  "Pacific/Auckland",
+];
