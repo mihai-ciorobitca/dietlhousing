@@ -34,7 +34,7 @@ async function getContacts(searchParams: SearchParams): Promise<Contact[]> {
     const searchBy = parseSearchBy(firstStringParam(searchParams.search_by) || undefined);
     const callStatus = firstStringParam(searchParams.call_status);
     const interested = firstStringParam(searchParams.interested);
-    const meetingType = firstStringParam(searchParams.call_meeting_type);
+    const meetingType = firstStringParam(searchParams.meeting_type);
     const preferedContact = firstStringParam(searchParams.prefered_contact);
 
     let query = supabase.from("Contacts").select("*").order("create_date", { ascending: false });
@@ -46,12 +46,12 @@ async function getContacts(searchParams: SearchParams): Promise<Contact[]> {
       } else if (searchBy === "phone_number") {
         query = query.ilike("phone_number", pattern);
       } else {
-        query = query.ilike("whatsapp_phone_number", pattern);
+        query = query.ilike("whatsapp_number", pattern);
       }
     }
     if (callStatus) query = query.eq("call_status", callStatus);
     if (interested) query = query.eq("interested", interested);
-    if (meetingType) query = query.eq("call_meeting_type", meetingType);
+    if (meetingType) query = query.eq("meeting_type", meetingType);
     if (preferedContact) query = query.eq("prefered_contact", preferedContact);
 
     const { data, error } = await query;
@@ -87,13 +87,13 @@ async function getFilterOptions(): Promise<{
   try {
     const { data } = await supabase
       .from("Contacts")
-      .select("call_status, call_meeting_type, interested, prefered_contact");
+      .select("call_status, meeting_type, interested, prefered_contact");
 
     const dbCallStatuses = [...new Set(
       (data || []).map((r) => r.call_status).filter((v): v is string => v != null && v !== "")
     )];
     const dbMeetingTypes = [...new Set(
-      (data || []).map((r) => r.call_meeting_type).filter((v): v is string => v != null && v !== "")
+      (data || []).map((r) => r.meeting_type).filter((v): v is string => v != null && v !== "")
     )];
     const dbInterested = [...new Set(
       (data || [])
@@ -151,7 +151,7 @@ export default async function ContactsPage({
         searchBy={parseSearchBy(firstStringParam(params.search_by) || undefined)}
         callStatus={firstStringParam(params.call_status)}
         interested={firstStringParam(params.interested)}
-        meetingType={firstStringParam(params.call_meeting_type)}
+        meetingType={firstStringParam(params.meeting_type)}
         preferedContact={firstStringParam(params.prefered_contact)}
         callStatuses={callStatuses}
         meetingTypes={meetingTypes}

@@ -17,13 +17,13 @@ export type Contact = {
   first_name: string;
   last_name: string;
   email: string;
-  whatsapp_phone_number: string | null;
+  whatsapp_number: string | null;
   phone_number: string | null;
   call_status: string | null;
   interested: string | null;
   call_summary: string | null;
   create_date: string | null;
-  call_meeting_type: string | null;
+  meeting_type: string | null;
   /** ISO 8601 UTC from Supabase timestamptz */
   call_date: string | null;
   call_recording: string | null;

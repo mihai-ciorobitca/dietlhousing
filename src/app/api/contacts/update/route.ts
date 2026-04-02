@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAuthenticated } from "@/lib/auth";
+import { normalizeCallDateForStorage } from "@/lib/callDate";
 import { supabase } from "@/lib/supabase";
 
 export async function PATCH(request: NextRequest) {
@@ -21,24 +22,24 @@ export async function PATCH(request: NextRequest) {
       if (v === null || v === "") {
         patch.call_date = null;
       } else if (typeof v === "string") {
-        const d = new Date(v);
-        if (Number.isNaN(d.getTime())) {
+        const normalized = normalizeCallDateForStorage(v);
+        if (!normalized) {
           return NextResponse.json({ error: "Invalid call_date" }, { status: 400 });
         }
-        patch.call_date = v;
+        patch.call_date = normalized;
       } else {
         return NextResponse.json({ error: "Invalid call_date" }, { status: 400 });
       }
     }
 
-    if ("call_meeting_type" in body) {
-      const v = body.call_meeting_type;
+    if ("meeting_type" in body) {
+      const v = body.meeting_type;
       if (v === null || v === "") {
-        patch.call_meeting_type = null;
+        patch.meeting_type = null;
       } else if (typeof v === "string") {
-        patch.call_meeting_type = v.trim();
+        patch.meeting_type = v.trim();
       } else {
-        return NextResponse.json({ error: "Invalid call_meeting_type" }, { status: 400 });
+        return NextResponse.json({ error: "Invalid meeting_type" }, { status: 400 });
       }
     }
 

@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAuthenticated } from "@/lib/auth";
-import { n8nCallDateFieldsFromStored } from "@/lib/callDate";
+import { n8nCallDateFieldsFromStored, normalizeCallDateForStorage } from "@/lib/callDate";
 import { supabase } from "@/lib/supabase";
 
+/**
+ * Saves meeting_type + call_date (London wall clock), then POSTs to n8n (same payload as /api/contacts/n8n-webhook).
+ */
 export async function POST(request: NextRequest) {
   if (!(await isAuthenticated())) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -19,8 +22,28 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const email = typeof body.email === "string" ? body.email.trim() : "";
+    const meeting_type =
+      typeof body.meeting_type === "string" && body.meeting_type.trim() !== ""
+        ? body.meeting_type.trim()
+        : null;
+    const call_date_raw =
+      typeof body.call_date === "string" && body.call_date.trim() !== ""
+        ? body.call_date.trim()
+        : null;
+
     if (!email) {
       return NextResponse.json({ error: "Email is required" }, { status: 400 });
+    }
+    if (!meeting_type) {
+      return NextResponse.json({ error: "Meeting type is required" }, { status: 400 });
+    }
+    if (!call_date_raw) {
+      return NextResponse.json({ error: "Call date is required" }, { status: 400 });
+    }
+
+    const call_date = normalizeCallDateForStorage(call_date_raw);
+    if (!call_date) {
+      return NextResponse.json({ error: "Invalid call_date" }, { status: 400 });
     }
 
     const { data: row, error: fetchError } = await supabase
@@ -47,21 +70,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (row.meeting_type == null || String(row.meeting_type).trim() === "") {
+    const { error: updateError } = await supabase
+      .from("Contacts")
+      .update({ meeting_type, call_date })
+      .eq("email", email);
+
+    if (updateError) {
+      console.error("Booking update:", updateError);
       return NextResponse.json(
-        { error: "Meeting type (meeting_type) must be set before sending" },
-        { status: 400 }
+        { error: updateError.message || "Failed to save booking" },
+        { status: 500 }
       );
     }
 
-    if (row.call_date == null || String(row.call_date).trim() === "") {
-      return NextResponse.json(
-        { error: "Call date must be set before sending" },
-        { status: 400 }
-      );
-    }
-
-    const callDateFields = n8nCallDateFieldsFromStored(String(row.call_date));
+    const callDateFields = n8nCallDateFieldsFromStored(call_date);
     if (!callDateFields) {
       return NextResponse.json({ error: "Invalid call_date" }, { status: 400 });
     }
@@ -72,7 +94,7 @@ export async function POST(request: NextRequest) {
       first_name: row.first_name,
       last_name: row.last_name,
       phone_number: row.phone_number,
-      meeting_type: row.meeting_type,
+      meeting_type,
       call_date: callDateFields.call_date,
       call_date_utc: callDateFields.call_date_utc,
       call_date_timezone: "Europe/London",
@@ -88,14 +110,16 @@ export async function POST(request: NextRequest) {
       const text = await res.text().catch(() => "");
       console.error("n8n webhook error:", res.status, text);
       return NextResponse.json(
-        { error: `n8n webhook failed (${res.status})` },
+        {
+          error: `Booking saved but n8n webhook failed (${res.status}). You can retry from the dashboard.`,
+        },
         { status: 502 }
       );
     }
 
     return NextResponse.json({ success: true });
   } catch (e) {
-    console.error("n8n webhook:", e);
+    console.error("Booking:", e);
     return NextResponse.json({ error: "Request failed" }, { status: 500 });
   }
 }

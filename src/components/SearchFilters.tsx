@@ -160,7 +160,7 @@ export default function SearchFilters({
             <select
               value={meetingType}
               onChange={(e) =>
-                updateParams({ call_meeting_type: e.target.value || null })
+                updateParams({ meeting_type: e.target.value || null })
               }
               className="w-full min-w-0 px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500"
             >

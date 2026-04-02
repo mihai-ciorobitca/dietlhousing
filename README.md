@@ -29,13 +29,14 @@ A Next.js admin panel for managing contacts from Supabase with password-only log
    - `first_name` (text)
    - `last_name` (text)
    - `email` (text, unique)
-   - `whatsapp_phone_number` (text)
+   - `whatsapp_number` (text)
    - `phone_number` (text)
    - `call_status` (text)
    - `interested` (text: NOT_INTERESTED, COULD_NOT_CALL, or call_status values)
    - `call_summary` (text)
    - `create_date` (timestamp)
-   - `call_meeting_type` (text)
+   - `meeting_type` (text)
+   - `call_date` (timestamptz, optional)
    - `call_recording` (text, URL)
 
 4. **Run locally**
